@@ -1,5 +1,7 @@
 import os
 import time
+
+import numpy as np
 import pyautogui
 
 from src.board import identification, extract
@@ -20,7 +22,6 @@ def loop():
         time.sleep(0.25)
         if pipeline_5x5()==-1:
             error = True
-        time.sleep(2.5)
         change_game()
 
 
@@ -86,10 +87,25 @@ def pipeline_5x5():
         return -1
 
 def change_game():
-    print("Changement de jeu...")
-    pyautogui.mouseDown(500, 800)
-    time.sleep(0.01)
-    pyautogui.mouseUp(500, 800)
-    print("Jeu changé")
-    time.sleep(0.25)
+    print("Attente du bouton vert...")
+    wait_for_color(500, 800, 510, 810, target_rgba=(16, 219, 0, 255), timeout=4)
+
+    print("Bouton prêt ! Click...")
+    pyautogui.mouseDown(505, 805)
+    pyautogui.mouseUp(505, 805)
+
+    wait_for_color(689, 169, 693, 173, target_rgba=(255, 255, 255, 255), timeout=0.20)
+
     pyautogui.scroll(500)
+    print("Jeu changé")
+
+def wait_for_color(x1, y1, x2, y2, target_rgba, timeout):
+    start_time = time.time()
+    target_rgb = target_rgba[:3]
+    while True:
+        screenshot = pyautogui.screenshot(region=(x1, y1, x2-x1, y2-y1))
+        img = np.array(screenshot)
+        avg_color = img.mean(axis=(0,1)).astype(int)
+        if np.allclose(avg_color, target_rgb, atol=5) or time.time() - start_time > timeout:
+            return
+        time.sleep(0.05)
