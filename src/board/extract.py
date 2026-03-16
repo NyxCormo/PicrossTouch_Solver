@@ -5,7 +5,9 @@ CELL_COUNT = GRID_SIZE * GRID_SIZE
 ROW_HINT_COUNT = GRID_SIZE
 COL_HINT_COUNT = GRID_SIZE
 TOTAL_EXPECTED = CELL_COUNT + ROW_HINT_COUNT + COL_HINT_COUNT + 1
-
+MIN_AREA = 200
+MIN_WIDTH = 10
+MIN_HEIGHT = 10
 
 def extract_picross_from_image(img, mask_path, show=False):
     """
@@ -81,7 +83,7 @@ def extract_picross_from_image(img, mask_path, show=False):
         x, y, w, h = cv2.boundingRect(contour)
         area = cv2.contourArea(contour)
 
-        if area < 50:
+        if area < MIN_AREA or w < MIN_WIDTH or h < MIN_HEIGHT:
             continue
 
         if show:

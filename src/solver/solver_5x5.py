@@ -4,16 +4,12 @@ from itertools import product
 GRID_SIZE = 5
 
 def print_grid(grid):
-    """X=rempli, .=vide, ?=inconnu"""
     symbols = { -1: '?', 0: '.', 1: 'X' }
     for row in grid:
         print(" ".join(symbols[val] for val in row))
     print()
 
 def generate_line_possibilities(length, hint):
-    """
-    Génère toutes les lignes possibles pour un hint donné
-    """
     if not hint:
         return [np.zeros(length, dtype=int)]
 
@@ -23,10 +19,8 @@ def generate_line_possibilities(length, hint):
     remaining = length - total_filled
     possibilities = []
 
-    # positions possibles du premier bloc
     def place_blocks(pos, idx, line):
         if idx == len(hint):
-            # remplir le reste de la ligne avec des 0
             l = line + [0]*(length - len(line))
             possibilities.append(np.array(l, dtype=int))
             return
@@ -35,14 +29,13 @@ def generate_line_possibilities(length, hint):
         for start in range(len(line), max_start+1):
             new_line = line + [0]*(start - len(line)) + [1]*block
             if idx < len(hint) - 1:
-                new_line.append(0)  # espace obligatoire entre blocs
+                new_line.append(0)
             place_blocks(start + block + 1, idx+1, new_line)
 
     place_blocks(0, 0, [])
     return possibilities
 
 def intersect_possibilities(possibilities):
-    """Intersection de toutes les lignes possibles pour trouver les cases fixes"""
     arr = np.array(possibilities)
     res = np.full(arr.shape[1], -1, dtype=int)
     for i in range(arr.shape[1]):
@@ -54,7 +47,6 @@ def intersect_possibilities(possibilities):
     return res
 
 def update_possibilities(possibilities, current_line):
-    """Filtre les possibilités qui sont compatibles avec la ligne actuelle"""
     new_poss = []
     for p in possibilities:
         compatible = True
@@ -67,9 +59,6 @@ def update_possibilities(possibilities, current_line):
     return new_poss
 
 def solve_picross(row_hints, col_hints, verbose=True):
-    """
-    Résout un Picross 5x5 donné les hints et retourne la grille finale.
-    """
     grid = np.full((GRID_SIZE, GRID_SIZE), -1, dtype=int)
 
     row_poss = [generate_line_possibilities(GRID_SIZE, h) for h in row_hints]
@@ -79,7 +68,6 @@ def solve_picross(row_hints, col_hints, verbose=True):
     while changed:
         changed = False
 
-        # --- lignes ---
         for r in range(GRID_SIZE):
             row = grid[r]
             filtered = update_possibilities(row_poss[r], row)
@@ -93,7 +81,6 @@ def solve_picross(row_hints, col_hints, verbose=True):
                     grid[r, c] = intersection[c]
             row_poss[r] = filtered
 
-        # --- colonnes ---
         for c in range(GRID_SIZE):
             col = grid[:, c]
             filtered = update_possibilities(col_poss[c], col)
@@ -111,7 +98,6 @@ def solve_picross(row_hints, col_hints, verbose=True):
             print("Grille après une itération d'intersection:")
             print_grid(grid)
 
-    # --- backtracking si cases restantes ---
     if np.any(grid == -1):
         if verbose:
             print("Il reste des cases inconnues, backtracking...")
@@ -121,7 +107,6 @@ def solve_picross(row_hints, col_hints, verbose=True):
     return grid
 
 def backtrack(grid, row_poss, col_poss, row_idx=0):
-    """Backtracking simple pour compléter la grille si logique seule ne suffit pas"""
     if row_idx == GRID_SIZE:
         return grid.copy()
 
@@ -137,7 +122,6 @@ def backtrack(grid, row_poss, col_poss, row_idx=0):
         new_grid = grid.copy()
         new_grid[row_idx] = line
 
-        # filtrer colonnes
         valid_cols = True
         new_col_poss = []
         for c in range(GRID_SIZE):
@@ -158,7 +142,6 @@ def backtrack(grid, row_poss, col_poss, row_idx=0):
 
 
 if __name__ == "__main__":
-    # hints à remplacer par ton identify_hints
     row_hints = [[3], [5], [5], [1], [2]]
     col_hints = [[2], [3,1], [5], [3], [2]]
 
