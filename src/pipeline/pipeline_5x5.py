@@ -3,7 +3,7 @@ import time
 import pyautogui
 
 from src.board import identification, extract
-from src.solver import solver_5x5
+from src.solver import solver
 from src.runner import apply_solution, starter
 
 FOLDER_ASSETS = 'assets'
@@ -69,11 +69,11 @@ def pipeline_5x5():
         row_hints = identified_hints["row_hints"]
         col_hints = identified_hints["col_hints"]
 
-        solution = solver_5x5.solve_picross(row_hints, col_hints, verbose=True)
+        solution = solver.solve_picross(row_hints, col_hints, verbose=True)
 
         if solution is not None:
             print("\n=== SOLUTION FINALE ===")
-            solver_5x5.print_grid(solution)
+            solver.print_grid(solution)
             break
         else:
             print("\nAucune solution trouvée. Vérifie les hints identifiés !")
