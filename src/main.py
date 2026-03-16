@@ -1,7 +1,8 @@
 from src.board import identification, extract
 from src.solver import solver_5x5
+from src.runner import apply_solution, starter
 
-FOLDER_ASSETS = '../assets'
+FOLDER_ASSETS = 'assets'
 MASK_PATH = FOLDER_ASSETS + '/masks/mask_5x5_zoom.jpg'
 IMG_PATH = FOLDER_ASSETS + '/5x5_boards/476460_2.jpg'
 TEMPLATES_FOLDER = FOLDER_ASSETS + '/templates'
@@ -11,11 +12,13 @@ def main():
     """
     Point d'entrée principal du programme de résolution de Picross.
     """
+    screen_img = starter.wait_for_f9_and_capture()
+
     print("=== EXTRACTION DU PICROSS ===")
-    data = extract.extract_picross(IMG_PATH, MASK_PATH)
+    data = extract.extract_picross_from_image(screen_img, MASK_PATH, show=True)
 
     print("\n=== EXTRACTION DES HINTS ===")
-    hints = identification.extract_hints(data, show=False)
+    hints = identification.extract_hints(data, show=True)
 
     print("\n=== IDENTIFICATION DES HINTS PAR TEMPLATE MATCHING ===")
     identified_hints = identification.identify_hints(hints, TEMPLATES_FOLDER)
@@ -40,6 +43,7 @@ def main():
     else:
         print("\nAucune solution trouvée. Vérifie les hints identifiés !")
 
+    apply_solution.apply_solution_on_screen(picross_data=data, solution=solution)
 
 if __name__ == "__main__":
     main()
