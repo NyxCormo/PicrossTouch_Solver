@@ -1,7 +1,7 @@
-import src.pipeline.pipeline_5x5
+import src.pipeline.automation
 
 def main():
-    src.pipeline.pipeline_5x5.loop()
+    src.pipeline.automation.main()
 
 
 if __name__ == "__main__":
