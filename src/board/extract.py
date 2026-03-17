@@ -120,8 +120,7 @@ def extract_picross_from_image(img, mask_path, show=False):
 
     # ---------- CHECK COUNT ----------
     if len(elements) != TOTAL_EXPECTED:
-        logger.warning("Expected", TOTAL_EXPECTED, "elements but got", len(elements))
-
+        logger.warning(f"Expected {TOTAL_EXPECTED} elements but got {len(elements)}")
     # ---------- SORT ----------
     elements.sort(key=lambda e: e["centroid"][1])
 
