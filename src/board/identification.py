@@ -2,8 +2,12 @@ import cv2
 import numpy as np
 import os
 
+from src.utils.logger import setup_logger
+
 SEUIL = 0.3
-NORMALIZED_SIZE = (28, 28)  # taille normalisée pour matching
+NORMALIZED_SIZE = (28, 28)
+
+logger = setup_logger()
 
 def extract_hints(data, show=False):
     results = {"row_hints": [], "col_hints": []}
@@ -29,7 +33,6 @@ def extract_hints(data, show=False):
             crop_norm = cv2.resize(crop, NORMALIZED_SIZE)
             candidates.append({"x": x, "y": y, "w": w, "h": h, "image": crop_norm, "centroid": (cx, cy)})
 
-        # enlever doublons
         candidates.sort(key=lambda n: n["x"] if orientation=="horizontal" else n["y"])
         final_numbers, used_centroids = [], []
         for c in candidates:
@@ -59,7 +62,6 @@ def extract_hints(data, show=False):
 
 
 def identify_hints(hints, templates_folder):
-    # templates déjà binarisés => pas de preprocessing
     def load_templates(folder):
         templates = {}
         if not os.path.exists(folder):
@@ -88,7 +90,7 @@ def identify_hints(hints, templates_folder):
                 if max_val > best_score:
                     best_score, best_digit, best_file = max_val, digit, temp['filename']
         if best_file:
-            print(f"  -> Identifié: {best_digit} (score {best_score:.3f}, template: {best_file})")
+            logger.debug(f"Identifié: {best_digit} (score={best_score:.3f}, template={best_file})")
         return best_digit, best_score
 
     templates = load_templates(templates_folder)
@@ -102,7 +104,7 @@ def identify_hints(hints, templates_folder):
                 if score > SEUIL:
                     identified.append(digit)
                 else:
-                    print(f"  -> ATTENTION: Score trop faible ({score:.3f})")
+                    logger.warning(f"{key}[{idx}] → Score trop faible ({score:.3f})")
             results[key].append(identified)
 
     return results

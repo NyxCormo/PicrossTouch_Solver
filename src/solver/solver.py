@@ -1,11 +1,12 @@
 import numpy as np
 
+from src.utils.logger import setup_logger
 
-def print_grid(grid):
-    symbols = { -1: '?', 0: '.', 1: 'X' }
-    for row in grid:
-        print(" ".join(symbols[val] for val in row))
-    print()
+logger = setup_logger()
+
+def print_grid(grid, level="debug"):
+    msg = "\n" + grid_to_string(grid)
+    getattr(logger, level)(msg)
 
 def generate_line_possibilities(length, hint):
     if not hint:
@@ -69,7 +70,7 @@ def update_grid(poss_list, grid, is_row=True):
         poss_list[idx] = filtered
     return changed
 
-def solve_picross(row_hints, col_hints, verbose=True):
+def solve_picross(row_hints, col_hints):
 
     height = len(row_hints)
     width = len(col_hints)
@@ -103,13 +104,11 @@ def solve_picross(row_hints, col_hints, verbose=True):
         changed |= update_grid(row_poss, grid, is_row=True)
         changed |= update_grid(col_poss, grid, is_row=False)
 
-        if verbose:
-            print("Grille après une itération d'intersection:")
-            print_grid(grid)
+        logger.debug("Grille après une itération d'intersection:")
+        print_grid(grid, level="debug")
 
     if np.any(grid == -1):
-        if verbose:
-            print("Il reste des cases inconnues, backtracking...")
+        logger.debug("Il reste des cases inconnues, backtracking...")
         return backtrack(grid, row_poss, col_poss)
 
     return grid
@@ -150,11 +149,14 @@ def backtrack(grid, row_poss, col_poss, row_idx=0):
 
     return None
 
+def grid_to_string(grid):
+    symbols = {-1: '?', 0: '.', 1: 'X'}
+    return "\n".join(" ".join(symbols[val] for val in row) for row in grid)
 
 if __name__ == "__main__":
     row_hints_ = [[0], [0], [0], [3], [5], [5], [1], [2], [0], [0], [0]]
     col_hints_ = [[0], [0], [0], [2], [3,1], [5], [3], [2], [0], [0], [0]]
 
     solution = solve_picross(row_hints_, col_hints_)
-    print("=== Solution finale ===")
-    print_grid(solution)
+    logger.info("=== Solution finale ===")
+    print_grid(solution, level="info")

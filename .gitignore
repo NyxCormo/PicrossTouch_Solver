@@ -18,3 +18,7 @@ build/
 *.egg-info/
 
 # Assets
+
+
+# Utils
+src/utils/create_templates.py

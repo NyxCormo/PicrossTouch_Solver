@@ -1,5 +1,7 @@
 import cv2
 
+from src.utils.logger import setup_logger
+
 GRID_SIZE = 5
 CELL_COUNT = GRID_SIZE * GRID_SIZE
 ROW_HINT_COUNT = GRID_SIZE
@@ -8,6 +10,8 @@ TOTAL_EXPECTED = CELL_COUNT + ROW_HINT_COUNT + COL_HINT_COUNT + 1
 MIN_AREA = 200
 MIN_WIDTH = 10
 MIN_HEIGHT = 10
+
+logger = setup_logger()
 
 def extract_picross_from_image(img, mask_path, show=False):
     """
@@ -116,7 +120,7 @@ def extract_picross_from_image(img, mask_path, show=False):
 
     # ---------- CHECK COUNT ----------
     if len(elements) != TOTAL_EXPECTED:
-        print("WARNING expected", TOTAL_EXPECTED, "elements but got", len(elements))
+        logger.warning("Expected", TOTAL_EXPECTED, "elements but got", len(elements))
 
     # ---------- SORT ----------
     elements.sort(key=lambda e: e["centroid"][1])
